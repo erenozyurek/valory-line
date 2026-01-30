@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { SlidersHorizontal } from 'lucide-react';
@@ -191,7 +191,7 @@ const sortOptions = [
     { id: 'name-asc', label: 'A-Z' },
 ];
 
-export default function MagazaPage() {
+function MagazaContent() {
     const searchParams = useSearchParams();
     const kategoriParam = searchParams.get('kategori');
 
@@ -352,5 +352,17 @@ export default function MagazaPage() {
                 </div>
             </section>
         </div>
+    );
+}
+
+export default function MagazaPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-[#050505] pt-24 flex items-center justify-center">
+                <div className="text-[#D4AF37]">Yükleniyor...</div>
+            </div>
+        }>
+            <MagazaContent />
+        </Suspense>
     );
 }
