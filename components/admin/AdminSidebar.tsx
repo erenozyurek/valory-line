@@ -9,6 +9,7 @@ import {
     ShoppingBag,
     History,
     Package,
+    LayoutGrid,
     FileText,
     Phone,
     LogOut,
@@ -21,6 +22,7 @@ const navItems = [
     { href: '/admin/siparisler', label: 'Siparişler', icon: ShoppingBag },
     { href: '/admin/gecmis-siparisler', label: 'Geçmiş Siparişler', icon: History },
     { href: '/admin/urunler', label: 'Ürünler', icon: Package },
+    { href: '/admin/kategoriler', label: 'Kategoriler', icon: LayoutGrid },
     { href: '/admin/hakkimizda', label: 'Hakkımızda', icon: FileText },
     { href: '/admin/iletisim', label: 'İletişim', icon: Phone },
 ];
@@ -70,8 +72,8 @@ export function AdminSidebar() {
                                 <Link
                                     href={item.href}
                                     className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all duration-200 ${isActive
-                                            ? 'bg-[#D4AF37]/10 text-[#D4AF37]'
-                                            : 'text-[#A1A1AA] hover:text-white hover:bg-white/5'
+                                        ? 'bg-[#D4AF37]/10 text-[#D4AF37]'
+                                        : 'text-[#A1A1AA] hover:text-white hover:bg-white/5'
                                         }`}
                                 >
                                     <Icon size={18} />
