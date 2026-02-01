@@ -8,6 +8,7 @@ import { ChevronRight } from 'lucide-react';
 import { Section } from '@/components/ui/Section';
 import { ProductCard } from '@/components/ui/ProductCard';
 import { Button } from '@/components/ui/Button';
+import { OrganizationSchema, WebSiteSchema } from '@/components/StructuredData';
 
 // Product data - expanded categories
 const products = {
@@ -80,13 +81,17 @@ const products = {
 export default function Home() {
   return (
     <>
+      {/* Structured Data for SEO */}
+      <OrganizationSchema />
+      <WebSiteSchema />
+
       {/* Hero Section with Brand Image */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden" itemScope itemType="https://schema.org/WPHeader">
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
             src="/images/valoryline.jpeg"
-            alt="Valory Line"
+            alt="Valory Line lüks hediyelik eşya ve aksesuar koleksiyonu - premium takı, cüzdan, çanta"
             fill
             className="object-cover"
             priority
@@ -109,7 +114,7 @@ export default function Home() {
           >
             <Image
               src="/images/logo.png"
-              alt="Valory Line Logo"
+              alt="Valory Line logosu - lüks hediyelik eşya markası"
               width={150}
               height={150}
               className="mx-auto drop-shadow-2xl"
@@ -134,18 +139,19 @@ export default function Home() {
             transition={{ duration: 1.2, delay: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
             style={{ textShadow: '0 4px 30px rgba(0,0,0,0.5)' }}
           >
-            VALORY LINE
+            VALORY LINE - Lüks Hediyeler
           </motion.h1>
 
           <motion.p
-            className="text-lg md:text-xl text-white/90 max-w-xl mx-auto mb-12 leading-relaxed"
+            className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-12 leading-relaxed"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
             style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}
           >
-            Her anı özel kılan hediyeler. Kadın ve erkek için takı,
-            cüzdan, aksesuar ve benzersiz hediye seçenekleri.
+            Sevdiklerinize en özel hediyeleri sunuyoruz. Kadın ve erkek için özel tasarım takı, 
+            premium deri cüzdan, şık çanta ve benzersiz aksesuar koleksiyonlarımızla her anı 
+            özel kılın. Ücretsiz kargo ve özel hediye paketleme hizmetiyle.
           </motion.p>
 
           <motion.div
@@ -153,7 +159,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.9, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <Link href="/magaza">
+            <Link href="/magaza" aria-label="Tüm ürün koleksiyonunu görüntüle">
               <Button variant="primary" size="lg">
                 Koleksiyonu Keşfet
                 <ChevronRight size={18} className="ml-2" />
@@ -175,7 +181,7 @@ export default function Home() {
 
       {/* Featured Categories */}
       <Section id="products">
-        <div className="text-center mb-16">
+        <header className="text-center mb-16">
           <Image
             src="/images/logo.png"
             alt="Valory Line"
@@ -187,93 +193,98 @@ export default function Home() {
             Koleksiyonumuz
           </span>
           <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white mt-4 tracking-wide">
-            Özel Tasarım Hediyeler
+            Özel Tasarım Lüks Hediyeler
           </h2>
-          <p className="text-[#A1A1AA] mt-4 max-w-lg mx-auto">
-            Sevdikleriniz için en özel hediyeleri keşfedin.
-            Takı, aksesuar, cüzdan ve daha fazlası.
+          <p className="text-[#A1A1AA] mt-4 max-w-2xl mx-auto">
+            Sevdiklerinize en özel hediyeleri sunuyoruz. Altın kaplama takı, 
+            premium deri cüzdan, şık aksesuar ve daha fazlası. Her ürün özel 
+            hediye kutusuyla gönderilir.
           </p>
-        </div>
+        </header>
 
         {/* Kadın */}
-        <div id="kadin" className="mb-20">
-          <div className="flex items-center justify-between mb-8">
+        <article id="kadin" className="mb-20">
+          <header className="flex items-center justify-between mb-8">
             <h3 className="font-serif text-xl md:text-2xl text-white">
-              Kadın Hediyeleri
+              Kadınlar İçin Özel Hediyeler
             </h3>
             <Link
               href="/magaza?kategori=kadin"
               className="text-sm text-[#A1A1AA] flex items-center gap-1 transition-colors hover:text-[#D4AF37]"
+              aria-label="Tüm kadın hediyelerini görüntüle"
             >
               Tümünü Gör <ChevronRight size={16} />
             </Link>
-          </div>
+          </header>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
             {products.kadin.map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}
           </div>
-        </div>
+        </article>
 
         {/* Erkek */}
-        <div id="erkek" className="mb-20">
-          <div className="flex items-center justify-between mb-8">
+        <article id="erkek" className="mb-20">
+          <header className="flex items-center justify-between mb-8">
             <h3 className="font-serif text-xl md:text-2xl text-white">
-              Erkek Hediyeleri
+              Erkekler İçin Özel Hediyeler
             </h3>
             <Link
               href="/magaza?kategori=erkek"
               className="text-sm text-[#A1A1AA] flex items-center gap-1 transition-colors hover:text-[#D4AF37]"
+              aria-label="Tüm erkek hediyelerini görüntüle"
             >
               Tümünü Gör <ChevronRight size={16} />
             </Link>
-          </div>
+          </header>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
             {products.erkek.map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}
           </div>
-        </div>
+        </article>
 
         {/* Çift Hediyeleri */}
-        <div id="cift" className="mb-20">
-          <div className="flex items-center justify-between mb-8">
+        <article id="cift" className="mb-20">
+          <header className="flex items-center justify-between mb-8">
             <h3 className="font-serif text-xl md:text-2xl text-white">
-              Çift Hediyeleri
+              Çiftler İçin Özel Hediye Setleri
             </h3>
             <Link
               href="/magaza?kategori=cift"
               className="text-sm text-[#A1A1AA] flex items-center gap-1 transition-colors hover:text-[#D4AF37]"
+              aria-label="Tüm çift hediyelerini görüntüle"
             >
               Tümünü Gör <ChevronRight size={16} />
             </Link>
-          </div>
+          </header>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
             {products.cift.map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}
           </div>
-        </div>
+        </article>
 
         {/* Aksesuarlar */}
-        <div id="aksesuar">
-          <div className="flex items-center justify-between mb-8">
+        <article id="aksesuar">
+          <header className="flex items-center justify-between mb-8">
             <h3 className="font-serif text-xl md:text-2xl text-white">
-              Aksesuarlar
+              Premium Aksesuarlar
             </h3>
             <Link
               href="/magaza?kategori=aksesuar"
               className="text-sm text-[#A1A1AA] flex items-center gap-1 transition-colors hover:text-[#D4AF37]"
+              aria-label="Tüm aksesuarları görüntüle"
             >
               Tümünü Gör <ChevronRight size={16} />
             </Link>
-          </div>
+          </header>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
             {products.aksesuar.map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}
           </div>
-        </div>
+        </article>
       </Section>
 
       {/* CTA Section */}

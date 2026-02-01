@@ -1,44 +1,67 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import { Mail, Phone, MapPin, Clock } from 'lucide-react';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
+import { BreadcrumbSchema } from '@/components/StructuredData';
 
 export const metadata: Metadata = {
-    title: 'İletişim | Valory Line',
-    description: 'Valory Line ile iletişime geçin. Sorularınız, önerileriniz veya özel siparişleriniz için bize ulaşın.',
+    title: 'İletişim - Bize Ulaşın | Valory Line',
+    description: 'Valory Line ile iletişime geçin. Sorularınız, önerileriniz veya özel siparişleriniz için bize ulaşın. Telefon: +90 (212) 123 45 67, E-posta: info@valoryline.com',
+    alternates: {
+        canonical: '/iletisim',
+    },
+    openGraph: {
+        title: 'İletişim | Valory Line',
+        description: 'Valory Line ile iletişime geçin. Müşteri hizmetleri, özel siparişler ve sorularınız için bize ulaşın.',
+        url: '/iletisim',
+    },
 };
 
 export default function IletisimPage() {
+    const breadcrumbItems = [
+        { name: 'İletişim', url: '/iletisim' }
+    ];
+
     return (
-        <div className="min-h-screen bg-[#050505] pt-24">
-            {/* Header */}
-            <section className="py-12 lg:py-20 border-b border-white/5">
+        <>
+            <BreadcrumbSchema items={breadcrumbItems} />
+            
+            <div className="min-h-screen bg-[#050505] pt-24">
                 <div className="container-luxury">
-                    <div className="max-w-2xl">
-                        <span className="text-[#D4AF37] text-xs uppercase tracking-[0.4em] mb-4 block">
-                            Bize Ulaşın
-                        </span>
-                        <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-white tracking-wide mb-6">
-                            İletişim
-                        </h1>
-                        <p className="text-[#A1A1AA] text-lg leading-relaxed">
-                            Sorularınız, önerileriniz veya özel siparişleriniz için
-                            bizimle iletişime geçebilirsiniz.
-                        </p>
-                    </div>
+                    <Breadcrumb items={breadcrumbItems} />
                 </div>
-            </section>
 
-            {/* Contact Content */}
-            <section className="py-16 lg:py-24">
-                <div className="container-luxury">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-                        {/* Contact Info */}
-                        <div>
-                            <h2 className="font-serif text-2xl text-white mb-8">
-                                İletişim Bilgileri
-                            </h2>
+                {/* Header */}
+                <header className="py-12 lg:py-20 border-b border-white/5">
+                    <div className="container-luxury">
+                        <article className="max-w-2xl">
+                            <span className="text-[#D4AF37] text-xs uppercase tracking-[0.4em] mb-4 block">
+                                Bize Ulaşın
+                            </span>
+                            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-white tracking-wide mb-6">
+                                İletişim
+                            </h1>
+                            <p className="text-[#A1A1AA] text-lg leading-relaxed">
+                                Sorularınız, önerileriniz veya özel siparişleriniz için
+                                bizimle iletişime geçebilirsiniz. Müşteri memnuniyeti bizim için öncelik.
+                            </p>
+                        </article>
+                    </div>
+                </header>
 
-                            <div className="space-y-8">
+                {/* Contact Content */}
+                <section className="py-16 lg:py-24" itemScope itemType="https://schema.org/LocalBusiness">
+                    <meta itemProp="name" content="Valory Line" />
+                    <meta itemProp="description" content="Lüks hediyelik eşya ve aksesuar mağazası" />
+                    <div className="container-luxury">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                            {/* Contact Info */}
+                            <div>
+                                <h2 className="font-serif text-2xl text-white mb-8">
+                                    İletişim Bilgileri
+                                </h2>
+
+                                <address className="space-y-8 not-italic">
                                 {/* Email */}
                                 <div className="flex items-start gap-4">
                                     <div className="w-12 h-12 flex items-center justify-center border border-[#D4AF37]/30 rounded-full shrink-0">
@@ -85,21 +108,24 @@ export default function IletisimPage() {
                                     </div>
                                 </div>
 
-                                {/* Working Hours */}
-                                <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 flex items-center justify-center border border-[#D4AF37]/30 rounded-full shrink-0">
-                                        <Clock size={20} className="text-[#D4AF37]" />
+                                    {/* Working Hours */}
+                                    <div className="flex items-start gap-4" itemProp="openingHoursSpecification" itemScope itemType="https://schema.org/OpeningHoursSpecification">
+                                        <meta itemProp="dayOfWeek" content="Monday,Tuesday,Wednesday,Thursday,Friday,Saturday" />
+                                        <meta itemProp="opens" content="10:00" />
+                                        <meta itemProp="closes" content="20:00" />
+                                        <div className="w-12 h-12 flex items-center justify-center border border-[#D4AF37]/30 rounded-full shrink-0">
+                                            <Clock size={20} className="text-[#D4AF37]" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-white font-medium mb-1">Çalışma Saatleri</h3>
+                                            <p className="text-[#A1A1AA]">
+                                                Pazartesi - Cumartesi: 10:00 - 20:00<br />
+                                                Pazar: 12:00 - 18:00
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h3 className="text-white font-medium mb-1">Çalışma Saatleri</h3>
-                                        <p className="text-[#A1A1AA]">
-                                            Pazartesi - Cumartesi: 10:00 - 20:00<br />
-                                            Pazar: 12:00 - 18:00
-                                        </p>
-                                    </div>
-                                </div>
+                                </address>
                             </div>
-                        </div>
 
                         {/* Contact Form */}
                         <div>
@@ -187,21 +213,22 @@ export default function IletisimPage() {
                                 </button>
                             </form>
                         </div>
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            {/* Map Placeholder */}
-            <section className="border-t border-white/5">
-                <div className="h-[400px] bg-[#0a0a0a] flex items-center justify-center">
-                    <div className="text-center">
-                        <MapPin size={48} className="text-[#71717A] mx-auto mb-4" />
-                        <p className="text-[#71717A] text-sm uppercase tracking-widest">
-                            Harita Görünümü
-                        </p>
+                {/* Map Placeholder */}
+                <section className="border-t border-white/5">
+                    <div className="h-[400px] bg-[#0a0a0a] flex items-center justify-center">
+                        <div className="text-center">
+                            <MapPin size={48} className="text-[#71717A] mx-auto mb-4" />
+                            <p className="text-[#71717A] text-sm uppercase tracking-widest">
+                                Harita Görünümü
+                            </p>
+                        </div>
                     </div>
-                </div>
-            </section>
-        </div>
+                </section>
+            </div>
+        </>
     );
 }

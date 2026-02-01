@@ -30,10 +30,10 @@ export function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
                     {/* Brand Column */}
                     <div className="lg:col-span-1">
-                        <Link href="/" className="flex items-center gap-3 mb-6">
+                        <Link href="/" className="flex items-center gap-3 mb-6" aria-label="Valory Line Ana Sayfa">
                             <Image
                                 src="/images/logo.png"
-                                alt="Valory Line"
+                                alt="Valory Line logosu - lüks hediyelik eşya"
                                 width={60}
                                 height={60}
                                 className="object-contain"

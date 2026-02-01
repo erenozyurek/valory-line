@@ -32,21 +32,24 @@ export function Navbar() {
     const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
     return (
-        <motion.header
-            initial={{ y: -100 }}
-            animate={{ y: 0 }}
+        <header
             className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
                     ? 'bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5'
                     : 'bg-transparent'
                 }`}
         >
-            <nav className="container-luxury">
+            <motion.nav
+                initial={{ y: -100 }}
+                animate={{ y: 0 }}
+                className="container-luxury"
+                aria-label="Ana navigasyon"
+            >
                 <div className="flex items-center justify-between h-20">
                     {/* Logo */}
-                    <Link href="/" className="relative z-10 flex items-center gap-3">
+                    <Link href="/" className="relative z-10 flex items-center gap-3" aria-label="Valory Line Ana Sayfa">
                         <Image
                             src="/images/logo.png"
-                            alt="Valory Line"
+                            alt="Valory Line logosu"
                             width={50}
                             height={50}
                             className="object-contain"
@@ -104,7 +107,7 @@ export function Navbar() {
                         </button>
                     </div>
                 </div>
-            </nav>
+            </motion.nav>
 
             {/* Mobile Menu */}
             <AnimatePresence>
@@ -130,6 +133,6 @@ export function Navbar() {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </motion.header>
+        </header>
     );
 }

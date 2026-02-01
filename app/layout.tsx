@@ -18,24 +18,75 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Valory Line | Lüks Hediyelik Eşya & Aksesuar",
+  metadataBase: new URL('https://www.valoryline.com'),
+  title: {
+    default: "Valory Line | Lüks Hediyelik Eşya & Aksesuar - Premium Takı, Cüzdan, Çanta",
+    template: "%s | Valory Line"
+  },
   description:
-    "Valory Line'ın kadın ve erkek için özel tasarım takı, cüzdan, çanta ve hediyelik eşya koleksiyonunu keşfedin. Her anı özel kılan lüks hediyeler.",
+    "Valory Line'da kadın ve erkek için özel tasarım takı, cüzdan, çanta ve hediyelik eşya koleksiyonunu keşfedin. Her anı özel kılan lüks hediyeler. Ücretsiz kargo ve premium paketleme.",
   keywords: [
     "lüks hediyeler",
+    "hediyelik eşya",
     "kadın hediyeleri",
     "erkek hediyeleri",
-    "takı",
-    "cüzdan",
+    "altın kaplama takı",
+    "gümüş takı",
+    "deri cüzdan",
     "çift hediyeleri",
     "aksesuar",
     "premium hediye",
+    "doğum günü hediyesi",
+    "yıldönümü hediyesi",
+    "özel tasarım takı",
+    "lüks aksesuar istanbul"
   ],
+  authors: [{ name: "Valory Line" }],
+  creator: "Valory Line",
+  publisher: "Valory Line",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   openGraph: {
+    type: "website",
+    locale: "tr_TR",
+    url: "https://www.valoryline.com",
+    siteName: "Valory Line",
+    title: "Valory Line | Lüks Hediyelik Eşya & Aksesuar Mağazası",
+    description:
+      "Kadın ve erkek için özel tasarım takı, cüzdan, çanta ve hediyelik eşya koleksiyonu. Her anı özel kılan premium hediyeler.",
+    images: [
+      {
+        url: "/images/valoryline.jpeg",
+        width: 1200,
+        height: 630,
+        alt: "Valory Line - Lüks Hediyelik Eşya ve Aksesuar",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
     title: "Valory Line | Lüks Hediyelik Eşya & Aksesuar",
     description:
-      "Kadın ve erkek için özel tasarım takı, cüzdan, çanta ve hediyelik eşya koleksiyonu.",
-    type: "website",
+      "Kadın ve erkek için özel tasarım takı, cüzdan, çanta. Her anı özel kılan lüks hediyeler.",
+    images: ["/images/valoryline.jpeg"],
+    creator: "@valoryline",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: "/",
   },
 };
 
@@ -46,6 +97,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr" className="dark" suppressHydrationWarning>
+      <head>
+        <link rel="canonical" href="https://www.valoryline.com" />
+      </head>
       <body
         className={`${playfair.variable} ${inter.variable} antialiased bg-[#050505] text-white`}
         suppressHydrationWarning
