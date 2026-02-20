@@ -3,186 +3,26 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal, Loader2 } from 'lucide-react';
 import { ProductCard } from '@/components/ui/ProductCard';
+import { productApi } from '@/lib/api/products';
+import { categoryApi } from '@/lib/api/categories';
 
-// Expanded product data with actual images
-const allProducts = [
-    // Kadın - Takı
-    {
-        id: 'kadin-taki-1',
-        name: 'Altın Kaplama Kolye Seti',
-        price: 2450,
-        image: '/products/necklace-1.png',
-        category: 'Takı',
-        type: 'kadin',
-    },
-    {
-        id: 'kadin-taki-2',
-        name: 'İnci Küpe Koleksiyonu',
-        price: 1850,
-        image: '/products/earring-1.png',
-        category: 'Takı',
-        type: 'kadin',
-    },
-    {
-        id: 'kadin-taki-3',
-        name: 'Gümüş Bileklik',
-        price: 1250,
-        image: '/products/bracelet-1.png',
-        category: 'Takı',
-        type: 'kadin',
-    },
-    {
-        id: 'kadin-canta-1',
-        name: 'Mini Deri El Çantası',
-        price: 3950,
-        image: '/products/bag-1.png',
-        category: 'Çanta',
-        type: 'kadin',
-    },
-    // Erkek
-    {
-        id: 'erkek-cuzdan-1',
-        name: 'Premium Deri Cüzdan',
-        price: 2950,
-        image: '/products/wallet-1.png',
-        category: 'Cüzdan',
-        type: 'erkek',
-    },
-    {
-        id: 'erkek-saat-1',
-        name: 'Paslanmaz Çelik Saat',
-        price: 4500,
-        image: '/products/watch-1.png',
-        category: 'Saat',
-        type: 'erkek',
-    },
-    {
-        id: 'erkek-kemer-1',
-        name: 'İtalyan Deri Kemer',
-        price: 1650,
-        image: '/products/belt-1.png',
-        category: 'Aksesuar',
-        type: 'erkek',
-    },
-    {
-        id: 'erkek-kartlik-1',
-        name: 'Minimalist Kartlık',
-        price: 1450,
-        image: '/products/cardholder-1.png',
-        category: 'Cüzdan',
-        type: 'erkek',
-    },
-    // Çift Hediyeleri
-    {
-        id: 'cift-1',
-        name: 'O & O Pasaport Kılıfı Seti',
-        price: 3200,
-        image: '/products/gift-1.png',
-        category: 'Çift Seti',
-        type: 'cift',
-    },
-    {
-        id: 'cift-2',
-        name: 'Eşleşen Bileklik Seti',
-        price: 1950,
-        image: '/products/bracelet-set.png',
-        category: 'Çift Seti',
-        type: 'cift',
-    },
-    {
-        id: 'cift-3',
-        name: 'Çift Anahtarlık Seti',
-        price: 950,
-        image: '/products/gift-1.png',
-        category: 'Çift Seti',
-        type: 'cift',
-    },
-    {
-        id: 'cift-4',
-        name: 'Yıldönümü Özel Kutusu',
-        price: 5500,
-        image: '/products/bracelet-set.png',
-        category: 'Çift Seti',
-        type: 'cift',
-    },
-    // Takı
-    {
-        id: 'taki-1',
-        name: 'Zümrüt Taşlı Yüzük',
-        price: 3850,
-        image: '/products/necklace-1.png',
-        category: 'Yüzük',
-        type: 'taki',
-    },
-    {
-        id: 'taki-2',
-        name: 'Elmas Kesim Kolye',
-        price: 4250,
-        image: '/products/necklace-1.png',
-        category: 'Kolye',
-        type: 'taki',
-    },
-    {
-        id: 'taki-3',
-        name: 'Vintage Broş Seti',
-        price: 1650,
-        image: '/products/earring-1.png',
-        category: 'Broş',
-        type: 'taki',
-    },
-    {
-        id: 'taki-4',
-        name: 'Zincir Bileklik',
-        price: 1950,
-        image: '/products/bracelet-1.png',
-        category: 'Bileklik',
-        type: 'taki',
-    },
-    // Aksesuar
-    {
-        id: 'aksesuar-1',
-        name: 'Kaşmir Atkı',
-        price: 1650,
-        image: '/products/scarf-1.png',
-        category: 'Atkı',
-        type: 'aksesuar',
-    },
-    {
-        id: 'aksesuar-2',
-        name: 'İpek Fular',
-        price: 1250,
-        image: '/products/scarf-1.png',
-        category: 'Fular',
-        type: 'aksesuar',
-    },
-    {
-        id: 'aksesuar-3',
-        name: 'Deri Eldiven',
-        price: 1450,
-        image: '/products/wallet-1.png',
-        category: 'Eldiven',
-        type: 'aksesuar',
-    },
-    {
-        id: 'aksesuar-4',
-        name: 'Güneş Gözlüğü',
-        price: 2250,
-        image: '/products/watch-1.png',
-        category: 'Gözlük',
-        type: 'aksesuar',
-    },
-];
+interface Product {
+    id: string;
+    name: string;
+    slug: string;
+    price: number;
+    image: string;
+    category: string;
+    categorySlug: string;
+}
 
-const categories = [
-    { id: 'all', label: 'Tümü' },
-    { id: 'kadin', label: 'Kadın' },
-    { id: 'erkek', label: 'Erkek' },
-    { id: 'cift', label: 'Çift' },
-    { id: 'taki', label: 'Takı' },
-    { id: 'aksesuar', label: 'Aksesuar' },
-];
+interface Category {
+    id: string;
+    slug: string;
+    label: string;
+}
 
 const sortOptions = [
     { id: 'default', label: 'Varsayılan' },
@@ -195,23 +35,69 @@ function MagazaContent() {
     const searchParams = useSearchParams();
     const kategoriParam = searchParams.get('kategori');
 
+    const [products, setProducts] = useState<Product[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [loading, setLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState('all');
     const [sortBy, setSortBy] = useState('default');
     const [showFilters, setShowFilters] = useState(false);
 
-    // Sync with URL parameter
     useEffect(() => {
-        if (kategoriParam && categories.some(c => c.id === kategoriParam)) {
+        loadData();
+    }, []);
+
+    useEffect(() => {
+        if (kategoriParam && categories.some(c => c.slug === kategoriParam)) {
             setActiveCategory(kategoriParam);
         } else {
             setActiveCategory('all');
         }
-    }, [kategoriParam]);
+    }, [kategoriParam, categories]);
+
+    const loadData = async () => {
+        try {
+            setLoading(true);
+            const [productsData, categoriesData] = await Promise.all([
+                productApi.getAll(),
+                categoryApi.getAll(),
+            ]);
+
+            // Map products to the format ProductCard expects
+            const mappedProducts: Product[] = (productsData as any[]).map((p: any) => {
+                const category = categoriesData.find((c: any) => c.id === p.category_id);
+                return {
+                    id: p.id,
+                    name: p.name,
+                    slug: p.slug,
+                    price: p.price,
+                    image: p.images?.[0]?.url || '/products/placeholder.png',
+                    category: category?.name || '',
+                    categorySlug: category?.slug || '',
+                };
+            });
+
+            const mappedCategories: Category[] = [
+                { id: 'all', slug: 'all', label: 'Tümü' },
+                ...(categoriesData as any[]).map((c: any) => ({
+                    id: c.id,
+                    slug: c.slug,
+                    label: c.name,
+                })),
+            ];
+
+            setProducts(mappedProducts);
+            setCategories(mappedCategories);
+        } catch (err) {
+            console.error('Veri yükleme hatası:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // Filter products
     let filteredProducts = activeCategory === 'all'
-        ? allProducts
-        : allProducts.filter(p => p.type === activeCategory);
+        ? products
+        : products.filter(p => p.categorySlug === activeCategory);
 
     // Sort products
     if (sortBy === 'price-asc') {
@@ -225,9 +111,17 @@ function MagazaContent() {
     // Get category title
     const getCategoryTitle = () => {
         if (activeCategory === 'all') return 'Tüm Ürünler';
-        const cat = categories.find(c => c.id === activeCategory);
+        const cat = categories.find(c => c.slug === activeCategory);
         return cat ? `${cat.label} Ürünleri` : 'Mağaza';
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-[#050505] pt-24 flex items-center justify-center">
+                <Loader2 size={32} className="animate-spin text-[#D4AF37]" />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-[#050505] pt-24">
@@ -259,8 +153,8 @@ function MagazaContent() {
                             {categories.map((cat) => (
                                 <button
                                     key={cat.id}
-                                    onClick={() => setActiveCategory(cat.id)}
-                                    className={`px-5 py-2.5 text-sm uppercase tracking-widest transition-all duration-300 ${activeCategory === cat.id
+                                    onClick={() => setActiveCategory(cat.slug)}
+                                    className={`px-5 py-2.5 text-sm uppercase tracking-widest transition-all duration-300 ${activeCategory === cat.slug
                                         ? 'bg-[#D4AF37] text-[#050505]'
                                         : 'bg-transparent text-[#A1A1AA] border border-white/10 hover:border-white/30'
                                         }`}
@@ -309,10 +203,10 @@ function MagazaContent() {
                                     <button
                                         key={cat.id}
                                         onClick={() => {
-                                            setActiveCategory(cat.id);
+                                            setActiveCategory(cat.slug);
                                             setShowFilters(false);
                                         }}
-                                        className={`px-4 py-2 text-sm uppercase tracking-widest transition-all duration-300 ${activeCategory === cat.id
+                                        className={`px-4 py-2 text-sm uppercase tracking-widest transition-all duration-300 ${activeCategory === cat.slug
                                             ? 'bg-[#D4AF37] text-[#050505]'
                                             : 'bg-transparent text-[#A1A1AA] border border-white/10'
                                             }`}

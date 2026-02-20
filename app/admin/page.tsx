@@ -27,18 +27,20 @@ export default function AdminLoginPage() {
         setError('');
         setIsLoading(true);
 
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 500));
+        try {
+            const success = await login(email, password);
 
-        const success = login(email, password);
-
-        if (success) {
-            router.push('/admin/dashboard');
-        } else {
-            setError('Geçersiz e-posta veya şifre');
+            if (success) {
+                router.push('/admin/dashboard');
+            } else {
+                setError('Geçersiz e-posta veya şifre');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            setError('Giriş yapılırken bir hata oluştu');
+        } finally {
+            setIsLoading(false);
         }
-
-        setIsLoading(false);
     };
 
     return (

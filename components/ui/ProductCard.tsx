@@ -1,16 +1,18 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ShoppingBag } from 'lucide-react';
-import { useCartStore } from '@/store/cartStore';
+import { ShowcaseNotice } from '@/components/ShowcaseNotice';
 
 interface ProductCardProps {
     id: string;
     name: string;
     price: number;
     image: string;
+    slug?: string;
     category?: string;
 }
 
@@ -19,15 +21,18 @@ export function ProductCard({
     name,
     price,
     image,
+    slug,
     category,
 }: ProductCardProps) {
-    const addItem = useCartStore((state) => state.addItem);
+    const [showNotice, setShowNotice] = useState(false);
 
-    const handleAddToCart = () => {
-        addItem({ id, name, price, image });
+    const handleAddToCart = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setShowNotice(true);
     };
 
-    return (
+    const card = (
         <motion.article
             className="group relative flex flex-col"
             initial={{ opacity: 0, y: 20 }}
@@ -72,5 +77,20 @@ export function ProductCard({
                 </p>
             </div>
         </motion.article>
+    );
+
+    if (slug) {
+        return (
+            <Link href={`/urun/${slug}`} className="block">
+                {card}
+            </Link>
+        );
+    }
+
+    return (
+        <>
+            {card}
+            <ShowcaseNotice isOpen={showNotice} onClose={() => setShowNotice(false)} />
+        </>
     );
 }

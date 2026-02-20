@@ -1,34 +1,73 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Save, CheckCircle } from 'lucide-react';
+import { Save, CheckCircle, Loader2 } from 'lucide-react';
+import { aboutApi } from '@/lib/api/about';
 
 export default function AdminHakkimizdaPage() {
     const [saved, setSaved] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState('');
     const [formData, setFormData] = useState({
-        title: 'Her An Özel, Her Hediye Benzersiz',
-        subtitle: 'Hikayemiz',
-        description: '2018 yılında kurulan Valory Line, özel anları unutulmaz kılmak için yola çıktı. Kadın ve erkek için tasarladığımız her ürün, sevgi ve özenle hazırlanmış bir hediyedir.',
-        vision: 'Valory Line olarak inanıyoruz ki hediye vermek bir sanattır. Doğru hediye, karşınızdaki kişiye ne kadar değer verdiğinizi gösterir.',
-        values: 'Koleksiyonumuz, kadın ve erkek için özenle seçilmiş takılar, cüzdanlar, çantalar, saatler ve aksesuarlardan oluşur. Her ürün, hem kalitesi hem de estetiğiyle dikkat çeker.',
-        experience: '7',
-        customers: '10000',
-        products: '500',
-        cities: '81',
+        title: '',
+        subtitle: '',
+        description: '',
+        vision: '',
+        values: '',
+        experience: '',
+        customers: '',
+        products: '',
+        cities: '',
     });
+
+    useEffect(() => {
+        loadData();
+    }, []);
+
+    const loadData = async () => {
+        try {
+            setLoading(true);
+            const data = await aboutApi.getAsObject();
+            setFormData(data);
+        } catch (err) {
+            console.error('Veri yükleme hatası:', err);
+            setError('Veriler yüklenirken hata oluştu');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // In a real app, this would save to a database
-        setSaved(true);
-        setTimeout(() => setSaved(false), 3000);
+        setSaving(true);
+        setError('');
+
+        try {
+            await aboutApi.updateFromForm(formData);
+            setSaved(true);
+            setTimeout(() => setSaved(false), 3000);
+        } catch (err) {
+            console.error('Kaydetme hatası:', err);
+            setError('Değişiklikler kaydedilirken hata oluştu');
+        } finally {
+            setSaving(false);
+        }
     };
+
+    if (loading) {
+        return (
+            <div className="p-8 flex items-center justify-center min-h-[400px]">
+                <Loader2 size={32} className="animate-spin text-[#D4AF37]" />
+            </div>
+        );
+    }
 
     return (
         <div className="p-8">
@@ -48,6 +87,13 @@ export default function AdminHakkimizdaPage() {
                     <CheckCircle size={18} />
                     Değişiklikler kaydedildi
                 </motion.div>
+            )}
+
+            {/* Error Message */}
+            {error && (
+                <div className="flex items-center gap-3 p-4 mb-6 bg-red-500/10 border border-red-500/30 text-red-400">
+                    {error}
+                </div>
             )}
 
             <form onSubmit={handleSubmit} className="max-w-3xl space-y-8">
@@ -168,10 +214,11 @@ export default function AdminHakkimizdaPage() {
                 {/* Submit Button */}
                 <button
                     type="submit"
-                    className="flex items-center gap-2 bg-[#D4AF37] text-[#050505] px-6 py-3 font-medium hover:bg-white transition-colors"
+                    disabled={saving}
+                    className="flex items-center gap-2 bg-[#D4AF37] text-[#050505] px-6 py-3 font-medium hover:bg-white transition-colors disabled:opacity-50"
                 >
-                    <Save size={18} />
-                    Kaydet
+                    {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                    {saving ? 'Kaydediliyor...' : 'Kaydet'}
                 </button>
             </form>
         </div>

@@ -1,97 +1,87 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Loader2 } from 'lucide-react';
 import { Section } from '@/components/ui/Section';
 import { ProductCard } from '@/components/ui/ProductCard';
 import { Button } from '@/components/ui/Button';
-import { OrganizationSchema, WebSiteSchema } from '@/components/StructuredData';
+import { productApi } from '@/lib/api/products';
+import { categoryApi } from '@/lib/api/categories';
 
-// Product data - expanded categories
-const products = {
-  kadin: [
-    {
-      id: 'kadin-1',
-      name: 'Altın Kaplama Kolye Seti',
-      price: 2450,
-      image: '/products/necklace-1.png',
-      category: 'Takı',
-    },
-    {
-      id: 'kadin-2',
-      name: 'İnci Küpe Koleksiyonu',
-      price: 1850,
-      image: '/products/earring-1.png',
-      category: 'Takı',
-    },
-  ],
-  erkek: [
-    {
-      id: 'erkek-1',
-      name: 'Premium Deri Cüzdan',
-      price: 2950,
-      image: '/products/wallet-1.png',
-      category: 'Cüzdan',
-    },
-    {
-      id: 'erkek-2',
-      name: 'Paslanmaz Çelik Saat',
-      price: 4500,
-      image: '/products/watch-1.png',
-      category: 'Saat',
-    },
-  ],
-  cift: [
-    {
-      id: 'cift-1',
-      name: 'O & O Pasaport Kılıfı Seti',
-      price: 3200,
-      image: '/products/gift-1.png',
-      category: 'Çift Seti',
-    },
-    {
-      id: 'cift-2',
-      name: 'Eşleşen Bileklik Seti',
-      price: 1950,
-      image: '/products/bracelet-set.png',
-      category: 'Çift Seti',
-    },
-  ],
-  aksesuar: [
-    {
-      id: 'aksesuar-1',
-      name: 'Kaşmir Atkı',
-      price: 1650,
-      image: '/products/scarf-1.png',
-      category: 'Aksesuar',
-    },
-    {
-      id: 'aksesuar-2',
-      name: 'Deri Kemer',
-      price: 1450,
-      image: '/products/belt-1.png',
-      category: 'Aksesuar',
-    },
-  ],
-};
+interface MappedProduct {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  category: string;
+}
+
+interface CategoryWithProducts {
+  id: string;
+  name: string;
+  slug: string;
+  products: MappedProduct[];
+}
 
 export default function Home() {
+  const [categories, setCategories] = useState<CategoryWithProducts[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const [productsData, categoriesData] = await Promise.all([
+        productApi.getAll(),
+        categoryApi.getAll(),
+      ]);
+
+      // Group products by category, show max 2 per category on homepage
+      const categoriesWithProducts: CategoryWithProducts[] = (categoriesData as any[])
+        .map((cat: any) => {
+          const catProducts = (productsData as any[])
+            .filter((p: any) => p.category_id === cat.id)
+            .slice(0, 2)
+            .map((p: any) => ({
+              id: p.id,
+              name: p.name,
+              slug: p.slug,
+              price: p.price,
+              image: p.images?.[0]?.url || '/products/placeholder.png',
+              category: cat.name,
+            }));
+
+          return {
+            id: cat.id,
+            name: cat.name,
+            slug: cat.slug,
+            products: catProducts,
+          };
+        })
+        .filter(cat => cat.products.length > 0); // Only show categories with products
+
+      setCategories(categoriesWithProducts);
+    } catch (err) {
+      console.error('Veri yükleme hatası:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
-      {/* Structured Data for SEO */}
-      <OrganizationSchema />
-      <WebSiteSchema />
-
       {/* Hero Section with Brand Image */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden" itemScope itemType="https://schema.org/WPHeader">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
             src="/images/valoryline.jpeg"
-            alt="Valory Line lüks hediyelik eşya ve aksesuar koleksiyonu - premium takı, cüzdan, çanta"
+            alt="Valory Line tasarım hediyelik eşya ve aksesuar koleksiyonu - şık takı, cüzdan, çanta"
             fill
             className="object-cover"
             priority
@@ -114,7 +104,7 @@ export default function Home() {
           >
             <Image
               src="/images/logo.png"
-              alt="Valory Line logosu - lüks hediyelik eşya markası"
+              alt="Valory Line logosu - özel tasarım hediyelik eşya markası"
               width={150}
               height={150}
               className="mx-auto drop-shadow-2xl"
@@ -128,7 +118,7 @@ export default function Home() {
             transition={{ duration: 1, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <span className="inline-block text-[#D4AF37] text-xs uppercase tracking-[0.4em] mb-6">
-              Lüks Hediyelik Eşya & Aksesuar
+              Özel Tasarım Hediyelik Eşya & Aksesuar
             </span>
           </motion.div>
 
@@ -139,7 +129,7 @@ export default function Home() {
             transition={{ duration: 1.2, delay: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
             style={{ textShadow: '0 4px 30px rgba(0,0,0,0.5)' }}
           >
-            VALORY LINE - Lüks Hediyeler
+            VALORY LINE - Özel Tasarımlar
           </motion.h1>
 
           <motion.p
@@ -149,8 +139,8 @@ export default function Home() {
             transition={{ duration: 1, delay: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
             style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}
           >
-            Sevdiklerinize en özel hediyeleri sunuyoruz. Kadın ve erkek için özel tasarım takı, 
-            premium deri cüzdan, şık çanta ve benzersiz aksesuar koleksiyonlarımızla her anı 
+            Sevdiklerinize en özel hediyeleri sunuyoruz. Kadın ve erkek için özel tasarım takı,
+            kaliteli deri cüzdan, şık çanta ve seçkin aksesuar koleksiyonlarımızla her anı
             özel kılın. Ücretsiz kargo ve özel hediye paketleme hizmetiyle.
           </motion.p>
 
@@ -179,7 +169,7 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Featured Categories */}
+      {/* Featured Categories - from database */}
       <Section id="products">
         <header className="text-center mb-16">
           <Image
@@ -193,98 +183,49 @@ export default function Home() {
             Koleksiyonumuz
           </span>
           <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white mt-4 tracking-wide">
-            Özel Tasarım Lüks Hediyeler
+            Özel Tasarım Hediyeler
           </h2>
           <p className="text-[#A1A1AA] mt-4 max-w-2xl mx-auto">
-            Sevdiklerinize en özel hediyeleri sunuyoruz. Altın kaplama takı, 
-            premium deri cüzdan, şık aksesuar ve daha fazlası. Her ürün özel 
+            Sevdiklerinize en özel hediyeleri sunuyoruz. Altın kaplama takı,
+            kaliteli deri cüzdan, şık aksesuar ve daha fazlası. Her ürün özel
             hediye kutusuyla gönderilir.
           </p>
         </header>
 
-        {/* Kadın */}
-        <article id="kadin" className="mb-20">
-          <header className="flex items-center justify-between mb-8">
-            <h3 className="font-serif text-xl md:text-2xl text-white">
-              Kadınlar İçin Özel Hediyeler
-            </h3>
-            <Link
-              href="/magaza?kategori=kadin"
-              className="text-sm text-[#A1A1AA] flex items-center gap-1 transition-colors hover:text-[#D4AF37]"
-              aria-label="Tüm kadın hediyelerini görüntüle"
-            >
-              Tümünü Gör <ChevronRight size={16} />
-            </Link>
-          </header>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
-            {products.kadin.map((product) => (
-              <ProductCard key={product.id} {...product} />
-            ))}
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 size={32} className="animate-spin text-[#D4AF37]" />
           </div>
-        </article>
-
-        {/* Erkek */}
-        <article id="erkek" className="mb-20">
-          <header className="flex items-center justify-between mb-8">
-            <h3 className="font-serif text-xl md:text-2xl text-white">
-              Erkekler İçin Özel Hediyeler
-            </h3>
-            <Link
-              href="/magaza?kategori=erkek"
-              className="text-sm text-[#A1A1AA] flex items-center gap-1 transition-colors hover:text-[#D4AF37]"
-              aria-label="Tüm erkek hediyelerini görüntüle"
-            >
-              Tümünü Gör <ChevronRight size={16} />
+        ) : categories.length > 0 ? (
+          categories.map((cat, catIndex) => (
+            <article key={cat.id} id={cat.slug} className={catIndex < categories.length - 1 ? 'mb-20' : ''}>
+              <header className="flex items-center justify-between mb-8">
+                <h3 className="font-serif text-xl md:text-2xl text-white">
+                  {cat.name}
+                </h3>
+                <Link
+                  href={`/magaza?kategori=${cat.slug}`}
+                  className="text-sm text-[#A1A1AA] flex items-center gap-1 transition-colors hover:text-[#D4AF37]"
+                  aria-label={`Tüm ${cat.name} ürünlerini görüntüle`}
+                >
+                  Tümünü Gör <ChevronRight size={16} />
+                </Link>
+              </header>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
+                {cat.products.map((product) => (
+                  <ProductCard key={product.id} {...product} />
+                ))}
+              </div>
+            </article>
+          ))
+        ) : (
+          <div className="text-center py-20">
+            <p className="text-[#A1A1AA]">Henüz ürün eklenmemiş.</p>
+            <Link href="/admin/urunler" className="text-[#D4AF37] mt-4 inline-block hover:underline">
+              Admin panelinden ürün ekleyebilirsiniz
             </Link>
-          </header>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
-            {products.erkek.map((product) => (
-              <ProductCard key={product.id} {...product} />
-            ))}
           </div>
-        </article>
-
-        {/* Çift Hediyeleri */}
-        <article id="cift" className="mb-20">
-          <header className="flex items-center justify-between mb-8">
-            <h3 className="font-serif text-xl md:text-2xl text-white">
-              Çiftler İçin Özel Hediye Setleri
-            </h3>
-            <Link
-              href="/magaza?kategori=cift"
-              className="text-sm text-[#A1A1AA] flex items-center gap-1 transition-colors hover:text-[#D4AF37]"
-              aria-label="Tüm çift hediyelerini görüntüle"
-            >
-              Tümünü Gör <ChevronRight size={16} />
-            </Link>
-          </header>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
-            {products.cift.map((product) => (
-              <ProductCard key={product.id} {...product} />
-            ))}
-          </div>
-        </article>
-
-        {/* Aksesuarlar */}
-        <article id="aksesuar">
-          <header className="flex items-center justify-between mb-8">
-            <h3 className="font-serif text-xl md:text-2xl text-white">
-              Premium Aksesuarlar
-            </h3>
-            <Link
-              href="/magaza?kategori=aksesuar"
-              className="text-sm text-[#A1A1AA] flex items-center gap-1 transition-colors hover:text-[#D4AF37]"
-              aria-label="Tüm aksesuarları görüntüle"
-            >
-              Tümünü Gör <ChevronRight size={16} />
-            </Link>
-          </header>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
-            {products.aksesuar.map((product) => (
-              <ProductCard key={product.id} {...product} />
-            ))}
-          </div>
-        </article>
+        )}
       </Section>
 
       {/* CTA Section */}

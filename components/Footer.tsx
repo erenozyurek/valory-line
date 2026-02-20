@@ -33,7 +33,7 @@ export function Footer() {
                         <Link href="/" className="flex items-center gap-3 mb-6" aria-label="Valory Line Ana Sayfa">
                             <Image
                                 src="/images/logo.png"
-                                alt="Valory Line logosu - lüks hediyelik eşya"
+                                alt="Valory Line logosu - özel tasarım hediyelik eşya"
                                 width={60}
                                 height={60}
                                 className="object-contain"

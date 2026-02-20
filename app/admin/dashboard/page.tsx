@@ -1,25 +1,70 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Package, Users, TrendingUp } from 'lucide-react';
+import { ShoppingBag, Package, FolderOpen, TrendingUp, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 
-const stats = [
-    { label: 'Bekleyen Siparişler', value: 12, icon: ShoppingBag, href: '/admin/siparisler', color: 'text-blue-400' },
-    { label: 'Toplam Ürün', value: 48, icon: Package, href: '/admin/urunler', color: 'text-green-400' },
-    { label: 'Bu Ayki Satış', value: '₺45,230', icon: TrendingUp, href: '/admin/gecmis-siparisler', color: 'text-[#D4AF37]' },
-    { label: 'Toplam Müşteri', value: 156, icon: Users, href: '#', color: 'text-purple-400' },
-];
-
-const recentOrders = [
-    { id: 'VL00001', customer: 'Ahmet Yılmaz', total: 2450, status: 'Hazırlanıyor', date: '30 Ocak 2026' },
-    { id: 'VL00002', customer: 'Elif Demir', total: 3950, status: 'Kargoya Verildi', date: '30 Ocak 2026' },
-    { id: 'VL00003', customer: 'Mehmet Kaya', total: 1850, status: 'Beklemede', date: '29 Ocak 2026' },
-    { id: 'VL00004', customer: 'Zeynep Öz', total: 4500, status: 'Hazırlanıyor', date: '29 Ocak 2026' },
-];
+interface DashboardStats {
+    totalProducts: number;
+    totalCategories: number;
+    activeProducts: number;
+    totalOrders: number;
+}
 
 export default function AdminDashboardPage() {
+    const [stats, setStats] = useState<DashboardStats>({
+        totalProducts: 0,
+        totalCategories: 0,
+        activeProducts: 0,
+        totalOrders: 0,
+    });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        loadStats();
+    }, []);
+
+    const loadStats = async () => {
+        try {
+            setLoading(true);
+
+            const [productsRes, categoriesRes, activeProductsRes, ordersRes] = await Promise.all([
+                (supabase as any).from('products').select('id', { count: 'exact', head: true }),
+                (supabase as any).from('categories').select('id', { count: 'exact', head: true }),
+                (supabase as any).from('products').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+                (supabase as any).from('orders').select('id', { count: 'exact', head: true }),
+            ]);
+
+            setStats({
+                totalProducts: productsRes.count || 0,
+                totalCategories: categoriesRes.count || 0,
+                activeProducts: activeProductsRes.count || 0,
+                totalOrders: ordersRes.count || 0,
+            });
+        } catch (err) {
+            console.error('İstatistikler yüklenirken hata:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const statCards = [
+        { label: 'Toplam Ürün', value: stats.totalProducts, icon: Package, href: '/admin/urunler', color: 'text-green-400' },
+        { label: 'Aktif Ürün', value: stats.activeProducts, icon: TrendingUp, href: '/admin/urunler', color: 'text-[#D4AF37]' },
+        { label: 'Toplam Kategori', value: stats.totalCategories, icon: FolderOpen, href: '/admin/kategoriler', color: 'text-blue-400' },
+        { label: 'Toplam Sipariş', value: stats.totalOrders, icon: ShoppingBag, href: '/admin/siparisler', color: 'text-purple-400' },
+    ];
+
+    if (loading) {
+        return (
+            <div className="p-8 flex items-center justify-center min-h-[400px]">
+                <Loader2 size={32} className="animate-spin text-[#D4AF37]" />
+            </div>
+        );
+    }
+
     return (
         <div className="p-8">
             {/* Header */}
@@ -30,7 +75,7 @@ export default function AdminDashboardPage() {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-                {stats.map((stat, index) => {
+                {statCards.map((stat, index) => {
                     const Icon = stat.icon;
                     return (
                         <motion.div
@@ -54,47 +99,38 @@ export default function AdminDashboardPage() {
                 })}
             </div>
 
-            {/* Recent Orders */}
-            <div className="border border-white/5 bg-white/[0.02]">
-                <div className="p-6 border-b border-white/5 flex items-center justify-between">
-                    <h2 className="font-serif text-xl text-white">Son Siparişler</h2>
-                    <Link href="/admin/siparisler" className="text-sm text-[#D4AF37] hover:underline">
-                        Tümünü Gör
+            {/* Quick Actions */}
+            <div className="border border-white/5 bg-white/[0.02] p-6">
+                <h2 className="font-serif text-xl text-white mb-6">Hızlı İşlemler</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <Link
+                        href="/admin/urunler"
+                        className="flex items-center gap-3 p-4 border border-white/10 hover:border-[#D4AF37]/50 transition-colors"
+                    >
+                        <Package size={20} className="text-[#D4AF37]" />
+                        <span className="text-sm text-white">Yeni Ürün Ekle</span>
                     </Link>
-                </div>
-
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead>
-                            <tr className="border-b border-white/5">
-                                <th className="text-left p-4 text-xs text-[#71717A] uppercase tracking-widest font-normal">Sipariş No</th>
-                                <th className="text-left p-4 text-xs text-[#71717A] uppercase tracking-widest font-normal">Müşteri</th>
-                                <th className="text-left p-4 text-xs text-[#71717A] uppercase tracking-widest font-normal">Tutar</th>
-                                <th className="text-left p-4 text-xs text-[#71717A] uppercase tracking-widest font-normal">Durum</th>
-                                <th className="text-left p-4 text-xs text-[#71717A] uppercase tracking-widest font-normal">Tarih</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {recentOrders.map((order) => (
-                                <tr key={order.id} className="border-b border-white/5 hover:bg-white/[0.02]">
-                                    <td className="p-4 text-sm text-[#D4AF37]">#{order.id}</td>
-                                    <td className="p-4 text-sm text-white">{order.customer}</td>
-                                    <td className="p-4 text-sm text-white">₺{order.total.toLocaleString('tr-TR')}</td>
-                                    <td className="p-4">
-                                        <span className={`inline-block px-3 py-1 text-xs rounded-full ${order.status === 'Kargoya Verildi'
-                                                ? 'bg-green-500/10 text-green-400'
-                                                : order.status === 'Hazırlanıyor'
-                                                    ? 'bg-blue-500/10 text-blue-400'
-                                                    : 'bg-yellow-500/10 text-yellow-400'
-                                            }`}>
-                                            {order.status}
-                                        </span>
-                                    </td>
-                                    <td className="p-4 text-sm text-[#A1A1AA]">{order.date}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    <Link
+                        href="/admin/kategoriler"
+                        className="flex items-center gap-3 p-4 border border-white/10 hover:border-[#D4AF37]/50 transition-colors"
+                    >
+                        <FolderOpen size={20} className="text-[#D4AF37]" />
+                        <span className="text-sm text-white">Kategori Yönet</span>
+                    </Link>
+                    <Link
+                        href="/admin/hakkimizda"
+                        className="flex items-center gap-3 p-4 border border-white/10 hover:border-[#D4AF37]/50 transition-colors"
+                    >
+                        <TrendingUp size={20} className="text-[#D4AF37]" />
+                        <span className="text-sm text-white">Hakkımızda Düzenle</span>
+                    </Link>
+                    <Link
+                        href="/admin/iletisim"
+                        className="flex items-center gap-3 p-4 border border-white/10 hover:border-[#D4AF37]/50 transition-colors"
+                    >
+                        <ShoppingBag size={20} className="text-[#D4AF37]" />
+                        <span className="text-sm text-white">İletişim Düzenle</span>
+                    </Link>
                 </div>
             </div>
         </div>

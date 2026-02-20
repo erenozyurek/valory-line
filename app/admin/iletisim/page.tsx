@@ -1,31 +1,79 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Save, CheckCircle, Mail, Phone, MapPin, Clock } from 'lucide-react';
+import { Save, CheckCircle, Mail, Phone, MapPin, Clock, Loader2 } from 'lucide-react';
+import { contactApi } from '@/lib/api/contact';
 
 export default function AdminIletisimPage() {
     const [saved, setSaved] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState('');
     const [formData, setFormData] = useState({
-        email: 'info@valoryline.com',
-        phone: '+90 (212) 123 45 67',
-        address: 'Nişantaşı, Abdi İpekçi Caddesi No: 42',
-        city: 'Şişli, İstanbul 34367',
-        weekdayHours: 'Pazartesi - Cumartesi: 10:00 - 20:00',
-        weekendHours: 'Pazar: 12:00 - 18:00',
+        email: '',
+        phone: '',
+        address: '',
+        city: '',
+        weekdayHours: '',
+        weekendHours: '',
     });
+
+    useEffect(() => {
+        loadData();
+    }, []);
+
+    const loadData = async () => {
+        try {
+            setLoading(true);
+            const data = await contactApi.getAsObject();
+            setFormData({
+                email: data.email || '',
+                phone: data.phone || '',
+                address: data.address || '',
+                city: data.city || '',
+                weekdayHours: data.weekdayHours || '',
+                weekendHours: data.weekendHours || '',
+            });
+        } catch (err) {
+            console.error('Veri yükleme hatası:', err);
+            setError('Veriler yüklenirken hata oluştu');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // In a real app, this would save to a database
-        setSaved(true);
-        setTimeout(() => setSaved(false), 3000);
+        setSaving(true);
+        setError('');
+
+        try {
+            await contactApi.updateBulk(
+                Object.entries(formData).map(([key, value]) => ({ key, value }))
+            );
+            setSaved(true);
+            setTimeout(() => setSaved(false), 3000);
+        } catch (err) {
+            console.error('Kaydetme hatası:', err);
+            setError('Değişiklikler kaydedilirken hata oluştu');
+        } finally {
+            setSaving(false);
+        }
     };
+
+    if (loading) {
+        return (
+            <div className="p-8 flex items-center justify-center min-h-[400px]">
+                <Loader2 size={32} className="animate-spin text-[#D4AF37]" />
+            </div>
+        );
+    }
 
     return (
         <div className="p-8">
@@ -45,6 +93,13 @@ export default function AdminIletisimPage() {
                     <CheckCircle size={18} />
                     Değişiklikler kaydedildi
                 </motion.div>
+            )}
+
+            {/* Error Message */}
+            {error && (
+                <div className="flex items-center gap-3 p-4 mb-6 bg-red-500/10 border border-red-500/30 text-red-400">
+                    {error}
+                </div>
             )}
 
             <form onSubmit={handleSubmit} className="max-w-2xl space-y-8">
@@ -148,10 +203,11 @@ export default function AdminIletisimPage() {
                 {/* Submit Button */}
                 <button
                     type="submit"
-                    className="flex items-center gap-2 bg-[#D4AF37] text-[#050505] px-6 py-3 font-medium hover:bg-white transition-colors"
+                    disabled={saving}
+                    className="flex items-center gap-2 bg-[#D4AF37] text-[#050505] px-6 py-3 font-medium hover:bg-white transition-colors disabled:opacity-50"
                 >
-                    <Save size={18} />
-                    Kaydet
+                    {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                    {saving ? 'Kaydediliyor...' : 'Kaydet'}
                 </button>
             </form>
         </div>

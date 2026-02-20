@@ -1,31 +1,43 @@
-import React from 'react';
-import type { Metadata } from 'next';
-import { Mail, Phone, MapPin, Clock } from 'lucide-react';
-import { Breadcrumb } from '@/components/ui/Breadcrumb';
-import { BreadcrumbSchema } from '@/components/StructuredData';
+'use client';
 
-export const metadata: Metadata = {
-    title: 'İletişim - Bize Ulaşın | Valory Line',
-    description: 'Valory Line ile iletişime geçin. Sorularınız, önerileriniz veya özel siparişleriniz için bize ulaşın. Telefon: +90 (212) 123 45 67, E-posta: info@valoryline.com',
-    alternates: {
-        canonical: '/iletisim',
-    },
-    openGraph: {
-        title: 'İletişim | Valory Line',
-        description: 'Valory Line ile iletişime geçin. Müşteri hizmetleri, özel siparişler ve sorularınız için bize ulaşın.',
-        url: '/iletisim',
-    },
-};
+import React, { useState, useEffect } from 'react';
+import { Mail, Phone, MapPin, Clock, Loader2 } from 'lucide-react';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
+import { contactApi } from '@/lib/api/contact';
 
 export default function IletisimPage() {
+    const [loading, setLoading] = useState(true);
+    const [contactData, setContactData] = useState<Record<string, string>>({});
+
     const breadcrumbItems = [
         { name: 'İletişim', url: '/iletisim' }
     ];
 
+    useEffect(() => {
+        loadData();
+    }, []);
+
+    const loadData = async () => {
+        try {
+            const data = await contactApi.getAsObject();
+            setContactData(data);
+        } catch (err) {
+            console.error('Veri yükleme hatası:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-[#050505] pt-24 flex items-center justify-center">
+                <Loader2 size={32} className="animate-spin text-[#D4AF37]" />
+            </div>
+        );
+    }
+
     return (
         <>
-            <BreadcrumbSchema items={breadcrumbItems} />
-            
             <div className="min-h-screen bg-[#050505] pt-24">
                 <div className="container-luxury">
                     <Breadcrumb items={breadcrumbItems} />
@@ -50,169 +62,65 @@ export default function IletisimPage() {
                 </header>
 
                 {/* Contact Content */}
-                <section className="py-16 lg:py-24" itemScope itemType="https://schema.org/LocalBusiness">
-                    <meta itemProp="name" content="Valory Line" />
-                    <meta itemProp="description" content="Lüks hediyelik eşya ve aksesuar mağazası" />
+                <section className="py-16 lg:py-24">
                     <div className="container-luxury">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                        <div className="flex justify-center w-full">
                             {/* Contact Info */}
-                            <div>
-                                <h2 className="font-serif text-2xl text-white mb-8">
-                                    İletişim Bilgileri
-                                </h2>
-
-                                <address className="space-y-8 not-italic">
-                                {/* Email */}
-                                <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 flex items-center justify-center border border-[#D4AF37]/30 rounded-full shrink-0">
-                                        <Mail size={20} className="text-[#D4AF37]" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-white font-medium mb-1">E-posta</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-6xl">
+                                <address className="contents not-italic">
+                                    {/* Email */}
+                                    <div className="flex flex-col items-center text-center p-8 border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+                                        <div className="w-12 h-12 flex items-center justify-center border border-[#D4AF37]/30 rounded-full mb-6">
+                                            <Mail size={20} className="text-[#D4AF37]" />
+                                        </div>
+                                        <h3 className="text-white font-serif text-lg mb-4 uppercase tracking-widest">E-posta</h3>
                                         <a
-                                            href="mailto:info@valoryline.com"
-                                            className="text-[#A1A1AA] hover:text-[#D4AF37] transition-colors"
+                                            href={`mailto:${contactData.email || ''}`}
+                                            className="text-[#A1A1AA] hover:text-[#D4AF37] transition-colors text-sm"
                                         >
-                                            info@valoryline.com
+                                            {contactData.email || ''}
                                         </a>
                                     </div>
-                                </div>
 
-                                {/* Phone */}
-                                <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 flex items-center justify-center border border-[#D4AF37]/30 rounded-full shrink-0">
-                                        <Phone size={20} className="text-[#D4AF37]" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-white font-medium mb-1">Telefon</h3>
+                                    {/* Phone */}
+                                    <div className="flex flex-col items-center text-center p-8 border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+                                        <div className="w-12 h-12 flex items-center justify-center border border-[#D4AF37]/30 rounded-full mb-6">
+                                            <Phone size={20} className="text-[#D4AF37]" />
+                                        </div>
+                                        <h3 className="text-white font-serif text-lg mb-4 uppercase tracking-widest">Telefon</h3>
                                         <a
-                                            href="tel:+902121234567"
-                                            className="text-[#A1A1AA] hover:text-[#D4AF37] transition-colors"
+                                            href={`tel:${(contactData.phone || '').replace(/\s/g, '')}`}
+                                            className="text-[#A1A1AA] hover:text-[#D4AF37] transition-colors text-sm"
                                         >
-                                            +90 (212) 123 45 67
+                                            {contactData.phone || ''}
                                         </a>
                                     </div>
-                                </div>
 
-                                {/* Address */}
-                                <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 flex items-center justify-center border border-[#D4AF37]/30 rounded-full shrink-0">
-                                        <MapPin size={20} className="text-[#D4AF37]" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-white font-medium mb-1">Adres</h3>
-                                        <p className="text-[#A1A1AA]">
-                                            Nişantaşı, Abdi İpekçi Caddesi No: 42<br />
-                                            Şişli, İstanbul 34367
+                                    {/* Address */}
+                                    <div className="flex flex-col items-center text-center p-8 border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+                                        <div className="w-12 h-12 flex items-center justify-center border border-[#D4AF37]/30 rounded-full mb-6">
+                                            <MapPin size={20} className="text-[#D4AF37]" />
+                                        </div>
+                                        <h3 className="text-white font-serif text-lg mb-4 uppercase tracking-widest">Adres</h3>
+                                        <p className="text-[#A1A1AA] text-sm leading-relaxed">
+                                            {contactData.address || ''}<br />
+                                            {contactData.city || ''}
                                         </p>
                                     </div>
-                                </div>
 
                                     {/* Working Hours */}
-                                    <div className="flex items-start gap-4" itemProp="openingHoursSpecification" itemScope itemType="https://schema.org/OpeningHoursSpecification">
-                                        <meta itemProp="dayOfWeek" content="Monday,Tuesday,Wednesday,Thursday,Friday,Saturday" />
-                                        <meta itemProp="opens" content="10:00" />
-                                        <meta itemProp="closes" content="20:00" />
-                                        <div className="w-12 h-12 flex items-center justify-center border border-[#D4AF37]/30 rounded-full shrink-0">
+                                    <div className="flex flex-col items-center text-center p-8 border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+                                        <div className="w-12 h-12 flex items-center justify-center border border-[#D4AF37]/30 rounded-full mb-6">
                                             <Clock size={20} className="text-[#D4AF37]" />
                                         </div>
-                                        <div>
-                                            <h3 className="text-white font-medium mb-1">Çalışma Saatleri</h3>
-                                            <p className="text-[#A1A1AA]">
-                                                Pazartesi - Cumartesi: 10:00 - 20:00<br />
-                                                Pazar: 12:00 - 18:00
-                                            </p>
-                                        </div>
+                                        <h3 className="text-white font-serif text-lg mb-4 uppercase tracking-widest">Çalışma Saatleri</h3>
+                                        <p className="text-[#A1A1AA] text-sm leading-relaxed">
+                                            {contactData.weekdayHours || ''}<br />
+                                            {contactData.weekendHours || ''}
+                                        </p>
                                     </div>
                                 </address>
                             </div>
-
-                        {/* Contact Form */}
-                        <div>
-                            <h2 className="font-serif text-2xl text-white mb-8">
-                                Mesaj Gönderin
-                            </h2>
-
-                            <form className="space-y-6">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <div>
-                                        <label htmlFor="firstName" className="block text-sm text-[#A1A1AA] mb-2">
-                                            Ad
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="firstName"
-                                            name="firstName"
-                                            className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
-                                            placeholder="Adınız"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="lastName" className="block text-sm text-[#A1A1AA] mb-2">
-                                            Soyad
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="lastName"
-                                            name="lastName"
-                                            className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
-                                            placeholder="Soyadınız"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label htmlFor="email" className="block text-sm text-[#A1A1AA] mb-2">
-                                        E-posta
-                                    </label>
-                                    <input
-                                        type="email"
-                                        id="email"
-                                        name="email"
-                                        className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
-                                        placeholder="ornek@email.com"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label htmlFor="subject" className="block text-sm text-[#A1A1AA] mb-2">
-                                        Konu
-                                    </label>
-                                    <select
-                                        id="subject"
-                                        name="subject"
-                                        className="w-full px-4 py-3 bg-transparent border border-white/10 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
-                                    >
-                                        <option value="" className="bg-[#121212]">Konu Seçiniz</option>
-                                        <option value="order" className="bg-[#121212]">Sipariş Sorgulama</option>
-                                        <option value="product" className="bg-[#121212]">Ürün Bilgisi</option>
-                                        <option value="custom" className="bg-[#121212]">Özel Sipariş</option>
-                                        <option value="return" className="bg-[#121212]">İade & Değişim</option>
-                                        <option value="other" className="bg-[#121212]">Diğer</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label htmlFor="message" className="block text-sm text-[#A1A1AA] mb-2">
-                                        Mesaj
-                                    </label>
-                                    <textarea
-                                        id="message"
-                                        name="message"
-                                        rows={5}
-                                        className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors resize-none"
-                                        placeholder="Mesajınızı yazın..."
-                                    />
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    className="w-full bg-[#D4AF37] text-[#050505] py-4 text-sm font-medium tracking-wide transition-all duration-300 hover:bg-white"
-                                >
-                                    Gönder
-                                </button>
-                            </form>
-                        </div>
                         </div>
                     </div>
                 </section>

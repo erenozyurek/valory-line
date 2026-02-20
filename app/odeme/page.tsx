@@ -3,13 +3,15 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ChevronLeft, CreditCard, Truck, ShieldCheck, CheckCircle } from 'lucide-react';
+import { ChevronLeft, CreditCard, Truck, ShieldCheck, CheckCircle, ExternalLink, Store } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
+import { ShowcaseNotice } from '@/components/ShowcaseNotice';
 
 export default function OdemePage() {
     const { items, getTotalPrice, clearCart } = useCartStore();
     const [step, setStep] = useState(1);
     const [isOrderComplete, setIsOrderComplete] = useState(false);
+    const [showNotice, setShowNotice] = useState(false);
 
     const [formData, setFormData] = useState({
         // Teslimat Bilgileri
@@ -35,13 +37,8 @@ export default function OdemePage() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (step === 1) {
-            setStep(2);
-        } else {
-            // Simulate order completion
-            setIsOrderComplete(true);
-            clearCart();
-        }
+        // Checkout disabled - show Shopier notice
+        setShowNotice(true);
     };
 
     const formatPrice = (price: number) => {
@@ -107,307 +104,325 @@ export default function OdemePage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#050505] pt-24 pb-16">
-            <div className="container-luxury">
-                {/* Back Link */}
-                <Link
-                    href="/magaza"
-                    className="inline-flex items-center gap-2 text-[#A1A1AA] hover:text-white transition-colors mb-8"
-                >
-                    <ChevronLeft size={18} />
-                    Alışverişe Dön
-                </Link>
+        <>
+            <div className="min-h-screen bg-[#050505] pt-24 pb-16">
+                <div className="container-luxury">
+                    {/* Back Link */}
+                    <Link
+                        href="/magaza"
+                        className="inline-flex items-center gap-2 text-[#A1A1AA] hover:text-white transition-colors mb-8"
+                    >
+                        <ChevronLeft size={18} />
+                        Alışverişe Dön
+                    </Link>
 
-                {/* Header */}
-                <h1 className="font-serif text-3xl md:text-4xl text-white mb-8">
-                    Ödeme
-                </h1>
+                    {/* Header */}
+                    <h1 className="font-serif text-3xl md:text-4xl text-white mb-8">
+                        Ödeme
+                    </h1>
 
-                {/* Progress Steps */}
-                <div className="flex items-center gap-4 mb-12">
-                    <div className={`flex items-center gap-2 ${step >= 1 ? 'text-[#D4AF37]' : 'text-[#71717A]'}`}>
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 1 ? 'bg-[#D4AF37] text-[#050505]' : 'bg-white/10 text-[#71717A]'
-                            }`}>
-                            1
+                    {/* Progress Steps */}
+                    <div className="flex items-center gap-4 mb-12">
+                        <div className={`flex items-center gap-2 ${step >= 1 ? 'text-[#D4AF37]' : 'text-[#71717A]'}`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 1 ? 'bg-[#D4AF37] text-[#050505]' : 'bg-white/10 text-[#71717A]'
+                                }`}>
+                                1
+                            </div>
+                            <span className="hidden sm:inline text-sm">Teslimat</span>
                         </div>
-                        <span className="hidden sm:inline text-sm">Teslimat</span>
-                    </div>
-                    <div className={`flex-1 h-px ${step >= 2 ? 'bg-[#D4AF37]' : 'bg-white/10'}`} />
-                    <div className={`flex items-center gap-2 ${step >= 2 ? 'text-[#D4AF37]' : 'text-[#71717A]'}`}>
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 2 ? 'bg-[#D4AF37] text-[#050505]' : 'bg-white/10 text-[#71717A]'
-                            }`}>
-                            2
+                        <div className={`flex-1 h-px ${step >= 2 ? 'bg-[#D4AF37]' : 'bg-white/10'}`} />
+                        <div className={`flex items-center gap-2 ${step >= 2 ? 'text-[#D4AF37]' : 'text-[#71717A]'}`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 2 ? 'bg-[#D4AF37] text-[#050505]' : 'bg-white/10 text-[#71717A]'
+                                }`}>
+                                2
+                            </div>
+                            <span className="hidden sm:inline text-sm">Ödeme</span>
                         </div>
-                        <span className="hidden sm:inline text-sm">Ödeme</span>
                     </div>
-                </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                    {/* Left Column - Form */}
-                    <div className="lg:col-span-2">
-                        <form onSubmit={handleSubmit}>
-                            {step === 1 && (
-                                <motion.div
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    className="space-y-8"
-                                >
-                                    <div>
-                                        <h2 className="font-serif text-xl text-white mb-6 flex items-center gap-3">
-                                            <Truck size={20} className="text-[#D4AF37]" />
-                                            Teslimat Bilgileri
-                                        </h2>
-
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                            <div>
-                                                <label className="block text-sm text-[#A1A1AA] mb-2">Ad *</label>
-                                                <input
-                                                    type="text"
-                                                    name="firstName"
-                                                    value={formData.firstName}
-                                                    onChange={handleInputChange}
-                                                    required
-                                                    className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
-                                                    placeholder="Adınız"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm text-[#A1A1AA] mb-2">Soyad *</label>
-                                                <input
-                                                    type="text"
-                                                    name="lastName"
-                                                    value={formData.lastName}
-                                                    onChange={handleInputChange}
-                                                    required
-                                                    className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
-                                                    placeholder="Soyadınız"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm text-[#A1A1AA] mb-2">E-posta *</label>
-                                                <input
-                                                    type="email"
-                                                    name="email"
-                                                    value={formData.email}
-                                                    onChange={handleInputChange}
-                                                    required
-                                                    className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
-                                                    placeholder="ornek@email.com"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm text-[#A1A1AA] mb-2">Telefon *</label>
-                                                <input
-                                                    type="tel"
-                                                    name="phone"
-                                                    value={formData.phone}
-                                                    onChange={handleInputChange}
-                                                    required
-                                                    className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
-                                                    placeholder="+90 5XX XXX XX XX"
-                                                />
-                                            </div>
-                                            <div className="sm:col-span-2">
-                                                <label className="block text-sm text-[#A1A1AA] mb-2">Adres *</label>
-                                                <input
-                                                    type="text"
-                                                    name="address"
-                                                    value={formData.address}
-                                                    onChange={handleInputChange}
-                                                    required
-                                                    className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
-                                                    placeholder="Sokak, Mahalle, Bina No, Daire No"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm text-[#A1A1AA] mb-2">İl *</label>
-                                                <select
-                                                    name="city"
-                                                    value={formData.city}
-                                                    onChange={handleInputChange}
-                                                    required
-                                                    className="w-full px-4 py-3 bg-transparent border border-white/10 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
-                                                >
-                                                    <option value="" className="bg-[#121212]">İl Seçiniz</option>
-                                                    <option value="istanbul" className="bg-[#121212]">İstanbul</option>
-                                                    <option value="ankara" className="bg-[#121212]">Ankara</option>
-                                                    <option value="izmir" className="bg-[#121212]">İzmir</option>
-                                                    <option value="antalya" className="bg-[#121212]">Antalya</option>
-                                                    <option value="bursa" className="bg-[#121212]">Bursa</option>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm text-[#A1A1AA] mb-2">İlçe *</label>
-                                                <input
-                                                    type="text"
-                                                    name="district"
-                                                    value={formData.district}
-                                                    onChange={handleInputChange}
-                                                    required
-                                                    className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
-                                                    placeholder="İlçe"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm text-[#A1A1AA] mb-2">Posta Kodu</label>
-                                                <input
-                                                    type="text"
-                                                    name="postalCode"
-                                                    value={formData.postalCode}
-                                                    onChange={handleInputChange}
-                                                    className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
-                                                    placeholder="34000"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        type="submit"
-                                        className="w-full bg-[#D4AF37] text-[#050505] py-4 text-sm font-medium tracking-wide transition-all duration-300 hover:bg-white"
-                                    >
-                                        Ödemeye Devam Et
-                                    </button>
-                                </motion.div>
-                            )}
-
-                            {step === 2 && (
-                                <motion.div
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    className="space-y-8"
-                                >
-                                    <div>
-                                        <h2 className="font-serif text-xl text-white mb-6 flex items-center gap-3">
-                                            <CreditCard size={20} className="text-[#D4AF37]" />
-                                            Ödeme Bilgileri
-                                        </h2>
-
-                                        <div className="space-y-6">
-                                            <div>
-                                                <label className="block text-sm text-[#A1A1AA] mb-2">Kart Numarası *</label>
-                                                <input
-                                                    type="text"
-                                                    name="cardNumber"
-                                                    value={formData.cardNumber}
-                                                    onChange={handleInputChange}
-                                                    required
-                                                    maxLength={19}
-                                                    className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
-                                                    placeholder="1234 5678 9012 3456"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm text-[#A1A1AA] mb-2">Kart Üzerindeki İsim *</label>
-                                                <input
-                                                    type="text"
-                                                    name="cardName"
-                                                    value={formData.cardName}
-                                                    onChange={handleInputChange}
-                                                    required
-                                                    className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
-                                                    placeholder="AD SOYAD"
-                                                />
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-6">
-                                                <div>
-                                                    <label className="block text-sm text-[#A1A1AA] mb-2">Son Kullanma *</label>
-                                                    <input
-                                                        type="text"
-                                                        name="expiryDate"
-                                                        value={formData.expiryDate}
-                                                        onChange={handleInputChange}
-                                                        required
-                                                        maxLength={5}
-                                                        className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
-                                                        placeholder="AA/YY"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm text-[#A1A1AA] mb-2">CVV *</label>
-                                                    <input
-                                                        type="text"
-                                                        name="cvv"
-                                                        value={formData.cvv}
-                                                        onChange={handleInputChange}
-                                                        required
-                                                        maxLength={4}
-                                                        className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
-                                                        placeholder="123"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Security Badge */}
-                                    <div className="flex items-center gap-3 p-4 border border-white/5 bg-white/[0.02]">
-                                        <ShieldCheck size={24} className="text-green-500 shrink-0" />
-                                        <p className="text-sm text-[#A1A1AA]">
-                                            Ödeme bilgileriniz 256-bit SSL şifreleme ile korunmaktadır.
-                                        </p>
-                                    </div>
-
-                                    <div className="flex gap-4">
-                                        <button
-                                            type="button"
-                                            onClick={() => setStep(1)}
-                                            className="flex-1 border border-white/10 text-white py-4 text-sm font-medium tracking-wide transition-all duration-300 hover:border-white/30"
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                        {/* Left Column - Form */}
+                        <div className="lg:col-span-2">
+                            <form onSubmit={handleSubmit}>
+                                {/* Showcase Notice Banner */}
+                                <div className="flex items-center gap-3 p-4 mb-8 border border-[#D4AF37]/30 bg-[#D4AF37]/5">
+                                    <Store size={20} className="text-[#D4AF37] shrink-0" />
+                                    <div className="flex-1">
+                                        <p className="text-sm text-white">Satışlar şu an için yalnızca Shopier üzerinden yapılmaktadır.</p>
+                                        <a
+                                            href="https://www.shopier.com/VALORYLINE?utm_source=ig&utm_medium=social&utm_content=link_in_bio"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-[#D4AF37] text-sm hover:underline inline-flex items-center gap-1 mt-1"
                                         >
-                                            Geri
-                                        </button>
+                                            Shopier Mağazamız <ExternalLink size={12} />
+                                        </a>
+                                    </div>
+                                </div>
+                                {step === 1 && (
+                                    <motion.div
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        className="space-y-8"
+                                    >
+                                        <div>
+                                            <h2 className="font-serif text-xl text-white mb-6 flex items-center gap-3">
+                                                <Truck size={20} className="text-[#D4AF37]" />
+                                                Teslimat Bilgileri
+                                            </h2>
+
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                                <div>
+                                                    <label className="block text-sm text-[#A1A1AA] mb-2">Ad *</label>
+                                                    <input
+                                                        type="text"
+                                                        name="firstName"
+                                                        value={formData.firstName}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                        className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
+                                                        placeholder="Adınız"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm text-[#A1A1AA] mb-2">Soyad *</label>
+                                                    <input
+                                                        type="text"
+                                                        name="lastName"
+                                                        value={formData.lastName}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                        className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
+                                                        placeholder="Soyadınız"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm text-[#A1A1AA] mb-2">E-posta *</label>
+                                                    <input
+                                                        type="email"
+                                                        name="email"
+                                                        value={formData.email}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                        className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
+                                                        placeholder="ornek@email.com"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm text-[#A1A1AA] mb-2">Telefon *</label>
+                                                    <input
+                                                        type="tel"
+                                                        name="phone"
+                                                        value={formData.phone}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                        className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
+                                                        placeholder="+90 5XX XXX XX XX"
+                                                    />
+                                                </div>
+                                                <div className="sm:col-span-2">
+                                                    <label className="block text-sm text-[#A1A1AA] mb-2">Adres *</label>
+                                                    <input
+                                                        type="text"
+                                                        name="address"
+                                                        value={formData.address}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                        className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
+                                                        placeholder="Sokak, Mahalle, Bina No, Daire No"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm text-[#A1A1AA] mb-2">İl *</label>
+                                                    <select
+                                                        name="city"
+                                                        value={formData.city}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                        className="w-full px-4 py-3 bg-transparent border border-white/10 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
+                                                    >
+                                                        <option value="" className="bg-[#121212]">İl Seçiniz</option>
+                                                        <option value="istanbul" className="bg-[#121212]">İstanbul</option>
+                                                        <option value="ankara" className="bg-[#121212]">Ankara</option>
+                                                        <option value="izmir" className="bg-[#121212]">İzmir</option>
+                                                        <option value="antalya" className="bg-[#121212]">Antalya</option>
+                                                        <option value="bursa" className="bg-[#121212]">Bursa</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm text-[#A1A1AA] mb-2">İlçe *</label>
+                                                    <input
+                                                        type="text"
+                                                        name="district"
+                                                        value={formData.district}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                        className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
+                                                        placeholder="İlçe"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm text-[#A1A1AA] mb-2">Posta Kodu</label>
+                                                    <input
+                                                        type="text"
+                                                        name="postalCode"
+                                                        value={formData.postalCode}
+                                                        onChange={handleInputChange}
+                                                        className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
+                                                        placeholder="34000"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <button
                                             type="submit"
-                                            className="flex-1 bg-[#D4AF37] text-[#050505] py-4 text-sm font-medium tracking-wide transition-all duration-300 hover:bg-white"
+                                            className="w-full bg-[#D4AF37]/50 text-[#050505] py-4 text-sm font-medium tracking-wide cursor-not-allowed"
                                         >
-                                            Siparişi Tamamla
+                                            Ödemeye Devam Et
                                         </button>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </form>
-                    </div>
+                                    </motion.div>
+                                )}
 
-                    {/* Right Column - Order Summary */}
-                    <div className="lg:col-span-1">
-                        <div className="sticky top-28 p-6 border border-white/5 bg-white/[0.02]">
-                            <h2 className="font-serif text-xl text-white mb-6">
-                                Sipariş Özeti
-                            </h2>
+                                {step === 2 && (
+                                    <motion.div
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        className="space-y-8"
+                                    >
+                                        <div>
+                                            <h2 className="font-serif text-xl text-white mb-6 flex items-center gap-3">
+                                                <CreditCard size={20} className="text-[#D4AF37]" />
+                                                Ödeme Bilgileri
+                                            </h2>
 
-                            {/* Cart Items */}
-                            <div className="space-y-4 mb-6 max-h-[300px] overflow-y-auto">
-                                {items.map((item) => (
-                                    <div key={item.id} className="flex gap-4">
-                                        <div className="w-16 h-16 bg-[#121212] shrink-0" />
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm text-white truncate">{item.name}</p>
-                                            <p className="text-xs text-[#71717A]">Adet: {item.quantity}</p>
-                                            <p className="text-sm text-[#D4AF37]">{formatPrice(item.price * item.quantity)}</p>
+                                            <div className="space-y-6">
+                                                <div>
+                                                    <label className="block text-sm text-[#A1A1AA] mb-2">Kart Numarası *</label>
+                                                    <input
+                                                        type="text"
+                                                        name="cardNumber"
+                                                        value={formData.cardNumber}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                        maxLength={19}
+                                                        className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
+                                                        placeholder="1234 5678 9012 3456"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm text-[#A1A1AA] mb-2">Kart Üzerindeki İsim *</label>
+                                                    <input
+                                                        type="text"
+                                                        name="cardName"
+                                                        value={formData.cardName}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                        className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
+                                                        placeholder="AD SOYAD"
+                                                    />
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-6">
+                                                    <div>
+                                                        <label className="block text-sm text-[#A1A1AA] mb-2">Son Kullanma *</label>
+                                                        <input
+                                                            type="text"
+                                                            name="expiryDate"
+                                                            value={formData.expiryDate}
+                                                            onChange={handleInputChange}
+                                                            required
+                                                            maxLength={5}
+                                                            className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
+                                                            placeholder="AA/YY"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm text-[#A1A1AA] mb-2">CVV *</label>
+                                                        <input
+                                                            type="text"
+                                                            name="cvv"
+                                                            value={formData.cvv}
+                                                            onChange={handleInputChange}
+                                                            required
+                                                            maxLength={4}
+                                                            className="w-full px-4 py-3 bg-transparent border border-white/10 text-white placeholder:text-[#71717A] focus:outline-none focus:border-[#D4AF37] transition-colors"
+                                                            placeholder="123"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
 
-                            {/* Totals */}
-                            <div className="space-y-3 pt-6 border-t border-white/5">
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-[#A1A1AA]">Ara Toplam</span>
-                                    <span className="text-white">{formatPrice(getTotalPrice())}</span>
+                                        {/* Security Badge */}
+                                        <div className="flex items-center gap-3 p-4 border border-white/5 bg-white/[0.02]">
+                                            <ShieldCheck size={24} className="text-green-500 shrink-0" />
+                                            <p className="text-sm text-[#A1A1AA]">
+                                                Ödeme bilgileriniz 256-bit SSL şifreleme ile korunmaktadır.
+                                            </p>
+                                        </div>
+
+                                        <div className="flex gap-4">
+                                            <button
+                                                type="button"
+                                                onClick={() => setStep(1)}
+                                                className="flex-1 border border-white/10 text-white py-4 text-sm font-medium tracking-wide transition-all duration-300 hover:border-white/30"
+                                            >
+                                                Geri
+                                            </button>
+                                            <button
+                                                type="submit"
+                                                className="flex-1 bg-[#D4AF37]/50 text-[#050505] py-4 text-sm font-medium tracking-wide cursor-not-allowed"
+                                            >
+                                                Siparişi Tamamla
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </form>
+                        </div>
+
+                        {/* Right Column - Order Summary */}
+                        <div className="lg:col-span-1">
+                            <div className="sticky top-28 p-6 border border-white/5 bg-white/[0.02]">
+                                <h2 className="font-serif text-xl text-white mb-6">
+                                    Sipariş Özeti
+                                </h2>
+
+                                {/* Cart Items */}
+                                <div className="space-y-4 mb-6 max-h-[300px] overflow-y-auto">
+                                    {items.map((item) => (
+                                        <div key={item.id} className="flex gap-4">
+                                            <div className="w-16 h-16 bg-[#121212] shrink-0" />
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm text-white truncate">{item.name}</p>
+                                                <p className="text-xs text-[#71717A]">Adet: {item.quantity}</p>
+                                                <p className="text-sm text-[#D4AF37]">{formatPrice(item.price * item.quantity)}</p>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-[#A1A1AA]">Kargo</span>
-                                    <span className="text-green-500">Ücretsiz</span>
-                                </div>
-                                <div className="flex justify-between text-lg font-medium pt-3 border-t border-white/5">
-                                    <span className="text-white">Toplam</span>
-                                    <span className="text-[#D4AF37]">{formatPrice(getTotalPrice())}</span>
+
+                                {/* Totals */}
+                                <div className="space-y-3 pt-6 border-t border-white/5">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-[#A1A1AA]">Ara Toplam</span>
+                                        <span className="text-white">{formatPrice(getTotalPrice())}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-[#A1A1AA]">Kargo</span>
+                                        <span className="text-green-500">Ücretsiz</span>
+                                    </div>
+                                    <div className="flex justify-between text-lg font-medium pt-3 border-t border-white/5">
+                                        <span className="text-white">Toplam</span>
+                                        <span className="text-[#D4AF37]">{formatPrice(getTotalPrice())}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        <ShowcaseNotice isOpen={showNotice} onClose={() => setShowNotice(false)} />
+        </>
     );
 }

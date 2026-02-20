@@ -1,21 +1,16 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { adminApi } from '@/lib/api/admin';
+import type { Database } from '@/types/database';
 
-interface AdminUser {
-    email: string;
-    name: string;
-}
+type AdminUser = Database['public']['Tables']['admin_users']['Row'];
 
 interface AdminState {
     isLoggedIn: boolean;
     user: AdminUser | null;
-    login: (email: string, password: string) => boolean;
+    login: (email: string, password: string) => Promise<boolean>;
     logout: () => void;
 }
-
-// Mock credentials
-const ADMIN_EMAIL = 'admin@valoryline.com';
-const ADMIN_PASSWORD = 'admin123';
 
 export const useAdminStore = create<AdminState>()(
     persist(
@@ -23,18 +18,22 @@ export const useAdminStore = create<AdminState>()(
             isLoggedIn: false,
             user: null,
 
-            login: (email: string, password: string) => {
-                if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-                    set({
-                        isLoggedIn: true,
-                        user: {
-                            email: ADMIN_EMAIL,
-                            name: 'Admin',
-                        },
-                    });
-                    return true;
+            login: async (email: string, password: string) => {
+                try {
+                    const user = await adminApi.login(email, password);
+
+                    if (user) {
+                        set({
+                            isLoggedIn: true,
+                            user: user,
+                        });
+                        return true;
+                    }
+                    return false;
+                } catch (error) {
+                    console.error('Login error:', error);
+                    return false;
                 }
-                return false;
             },
 
             logout: () => {

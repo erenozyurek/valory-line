@@ -3,6 +3,7 @@ import { Playfair_Display, Inter } from "next/font/google";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { CartDrawer } from "@/components/CartDrawer";
+import { WelcomeShowcaseNotice } from "@/components/ShowcaseNotice";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -20,13 +21,13 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.valoryline.com'),
   title: {
-    default: "Valory Line | Lüks Hediyelik Eşya & Aksesuar - Premium Takı, Cüzdan, Çanta",
+    default: "Valory Line | Özel Tasarım Hediyelik Eşya & Aksesuar - Şık Takı, Cüzdan, Çanta",
     template: "%s | Valory Line"
   },
   description:
-    "Valory Line'da kadın ve erkek için özel tasarım takı, cüzdan, çanta ve hediyelik eşya koleksiyonunu keşfedin. Her anı özel kılan lüks hediyeler. Ücretsiz kargo ve premium paketleme.",
+    "Valory Line'da kadın ve erkek için özel tasarım takı, cüzdan, çanta ve hediyelik eşya koleksiyonunu keşfedin. Her anı özel kılan şık ürünler. Ücretsiz kargo ve özenli paketleme.",
   keywords: [
-    "lüks hediyeler",
+    "özel tasarım hediyeler",
     "hediyelik eşya",
     "kadın hediyeleri",
     "erkek hediyeleri",
@@ -68,9 +69,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Valory Line | Lüks Hediyelik Eşya & Aksesuar",
+    title: "Valory Line | Özel Tasarım Hediyelik Eşya & Aksesuar",
     description:
-      "Kadın ve erkek için özel tasarım takı, cüzdan, çanta. Her anı özel kılan lüks hediyeler.",
+      "Kadın ve erkek için özel tasarım takı, cüzdan, çanta. Her anı özel kılan şık hediyeler.",
     images: ["/images/valoryline.jpeg"],
     creator: "@valoryline",
   },
@@ -108,6 +109,7 @@ export default function RootLayout({
         <main className="min-h-screen">{children}</main>
         <Footer />
         <CartDrawer />
+        <WelcomeShowcaseNotice />
       </body>
     </html>
   );
